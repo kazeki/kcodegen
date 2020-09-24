@@ -1,0 +1,1 @@
+# Codegen Core [![Quality Gate Status](http://172.27.7.29:9000/api/project_badges/measure?project=com.kzk%3Akcodegen&metric=alert_status)](http://172.27.7.29:9000/dashboard?id=com.kzk%3Akcodegen)
