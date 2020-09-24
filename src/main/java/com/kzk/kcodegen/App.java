@@ -1,11 +1,14 @@
 package com.kzk.kcodegen;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author kazeki
  */
+@Slf4j
 public class App {
     public static void main(String[] args) {
         KCodeGenerator generator = new KCodeGenerator();
-        System.out.println(generator.renderDemo());
+        log.info(generator.renderDemo());
     }
 }
