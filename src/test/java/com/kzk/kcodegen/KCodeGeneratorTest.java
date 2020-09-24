@@ -2,7 +2,7 @@ package com.kzk.kcodegen;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author kazeki
@@ -13,7 +13,7 @@ class KCodeGeneratorTest {
     void renderDemo() {
         KCodeGenerator generator = new KCodeGenerator();
         String result = generator.renderDemo();
-        assertNull(result);
+        assertEquals("Hello, velocity", result);
     }
 
 }
