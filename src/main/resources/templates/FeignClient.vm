@@ -1,0 +1,54 @@
+package ${rootPackage}.feign;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+* ${apiDocs.info.title}
+* ${apiDocs.info.version}
+*/
+@FeignClient(name = "${serviceName}")
+public interface ${StringUtils.upperCamel(${serviceName})} {
+
+#foreach($endPoint in $apiDocs.getPaths().keySet())
+#set($endPointMethodDetails=$apiDocs.getPaths().get($endPoint))
+#foreach($method in $endPointMethodDetails.keySet())
+#set($detail = $endPointMethodDetails.get($method))
+    /**
+    * ${detail.summary}
+    */
+    @RequestMapping(value = "${endPoint}", method = RequestMethod.${method.toUpperCase()})
+    String ${detail.operationId}(
+#set($paramLeadComma = "")
+#foreach($param in $detail.getParameters())
+#if(${param.in}=="header")
+    ${paramLeadComma} @RequestHeader(name = "${param.name}") ${StringUtils.javaType(${param.type}, ${param.format})} ${param.name}
+#end
+#if(${param.in}=="query")
+    ${paramLeadComma} @RequestParam(name = "${param.name}") ${StringUtils.javaType(${param.type}, ${param.format})} ${param.name}
+#end
+#if(${param.in}=="body")
+#if(${StringUtils.isBlank(${param.schema})})
+    ${paramLeadComma} @RequestBody ${StringUtils.javaType(${param.type}, ${param.format})} ${param.name}
+#else
+#if(${StringUtils.isBlank(${param.schema.ref})})
+#if(${param.schema.type}=='array')
+    ${paramLeadComma} @RequestBody List<${StringUtils.javaType(${param.schema.items.type}, ${param.schema.items.format})}> ${param.name}
+#else
+    ${paramLeadComma} @RequestBody ${StringUtils.javaType(${param.schema.type}, ${param.schema.format})} ${param.name}
+#end
+#else
+    ${paramLeadComma} @RequestBody ${StringUtils.getModelNameFromRefStr(${param.schema.ref}, ${param})} ${param.name}
+#end
+#end
+#end
+#set($paramLeadComma = ",")
+#end
+    );
+
+#end
+
+#end
+}
