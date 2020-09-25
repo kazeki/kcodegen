@@ -28,17 +28,12 @@ public class KCodeGenerator {
 
         try {
             template = ve.getTemplate("templates/hello.vm");
+            StringWriter sw = new StringWriter();
+            template.merge(context, sw);
+            return sw.toString();
         } catch (Exception e) {
             log.error("{}异常!", optName, e);
         }
-
-
-        StringWriter sw = new StringWriter();
-
-        if (template != null) {
-            template.merge(context, sw);
-        }
-
-        return sw.toString();
+        return "";
     }
 }
