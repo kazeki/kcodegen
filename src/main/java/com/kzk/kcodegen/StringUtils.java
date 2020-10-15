@@ -8,14 +8,19 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class StringUtils {
+    public static String packageToPath(String packageStr) {
+        return packageStr.replaceAll("\\.", "/");
+    }
+
     public static String upperCamel(String str) {
         return CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL, str);
     }
 
-    public static String getModelNameFromRefStr(String refStr, ApiDocs.Path.Parameter parameter) {
+    public static String getModelNameFromRefStr(String refStr) {
         String res = "XXX";
         try {
             res = refStr.substring(refStr.lastIndexOf("/") + 1);
+            res = res.replaceAll("[«»]", "__");
         } catch (Exception e) {
             log.error("getModelNameFromRefStr {}", refStr, e);
         }
@@ -34,19 +39,21 @@ public class StringUtils {
         if ("integer".equals(type)) {
             if ("int32".equals(format)) {
                 return "Integer";
-            }
-            if ("int64".equals(format)) {
+            } else if ("int64".equals(format)) {
                 return "Long";
+            } else {
+                return "Integer";
             }
         }
-        if("string".equals(type)){
+        if ("string".equals(type)) {
             return "String";
         }
-        if("number".equals(type)){
+        if ("number".equals(type)) {
             if ("float".equals(format)) {
                 return "Float";
-            }
-            if ("double".equals(format)) {
+            } else if ("double".equals(format)) {
+                return "Double";
+            } else {
                 return "Double";
             }
         }

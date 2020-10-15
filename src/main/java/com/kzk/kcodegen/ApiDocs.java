@@ -14,6 +14,7 @@ public class ApiDocs {
     private String swagger;
     private Info info;
     private Map<String, Map<String, Path>> paths;
+    private Map<String, Definition> definitions;
 
     @Data
     public static class Info{
@@ -47,13 +48,23 @@ public class ApiDocs {
             private String description;
         }
 
-        @Data
-        public static class Schema{
-            @JsonProperty("$ref")
-            private String ref;
-            private String type;
-            private String format;
-            private Schema items;
-        }
+    }
+
+    @Data
+    public static class Definition {
+        private String title;
+        private String description;
+        private String type;
+        private List<String> required;
+        private Map<String, Schema> properties;
+    }
+
+    @Data
+    public static class Schema {
+        @JsonProperty("$ref")
+        private String ref;
+        private String type;
+        private String format;
+        private Schema items;
     }
 }

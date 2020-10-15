@@ -21,6 +21,9 @@
         <logback.version>1.2.3</logback.version>
         <httpclient-version>4.5.5</httpclient-version>
         <jackson.version>2.9.3</jackson.version>
+        <jcommander.version>1.78</jcommander.version>
+        <jcommander-validator-core.version>0.1.13</jcommander-validator-core.version>
+        <guava.version>20.0</guava.version>
     </properties>
 
     <dependencyManagement>
@@ -41,6 +44,24 @@
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>${httpclient-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.beust</groupId>
+                <artifactId>jcommander</artifactId>
+                <version>${jcommander.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>name.valery1707</groupId>
+                <artifactId>jcommander-validator-core</artifactId>
+                <version>${jcommander-validator-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
 
             <dependency>
@@ -97,9 +118,20 @@
         </dependency>
 
         <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>name.valery1707</groupId>
+            <artifactId>jcommander-validator-core</artifactId>
+        </dependency>
+
+
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>20.0</version>
         </dependency>
 
     </dependencies>

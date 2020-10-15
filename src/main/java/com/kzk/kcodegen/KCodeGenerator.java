@@ -1,7 +1,9 @@
 package com.kzk.kcodegen;
 
-import com.google.common.base.CaseFormat;
+import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.FastDateFormat;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -9,11 +11,9 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
+import java.io.*;
+import java.nio.file.FileAlreadyExistsException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,46 +21,65 @@ import java.util.Map;
  */
 @Slf4j
 public class KCodeGenerator {
-    private static VelocityEngine ve;
+    private VelocityEngine ve;
+    // TODO: macroLibraries
+    private List macroLibraries;
 
     public KCodeGenerator() {
-        ve = new VelocityEngine();
-        ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
-        ve.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
-        ve.setProperty("parser.space_gobbling", "lines");
-        ve.setProperty(Velocity.INPUT_ENCODING, "UTF-8");
-        ve.setProperty(Velocity.OUTPUT_ENCODING, "UTF-8");
-        ve.init();
+        this.ve = new VelocityEngine();
+        this.ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
+        this.ve.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+        this.ve.setProperty("parser.space_gobbling", "lines");
+        this.ve.setProperty(Velocity.INPUT_ENCODING, "UTF-8");
+        this.ve.setProperty(Velocity.OUTPUT_ENCODING, "UTF-8");
+        this.ve.init();
     }
 
-    public void reanderFeignClient(String serviceName, String rootPackage, ApiDocs apiDocs) {
-        String optName = "reanderFeignClient";
+    public KCodeGenerator(String propsFilename) {
+        this.ve = new VelocityEngine(propsFilename);
+        this.ve.init();
+    }
 
-        VelocityContext context = new VelocityContext();
-        context.put("serviceName", serviceName);
-        context.put("rootPackage", rootPackage);
-        context.put("apiDocs", apiDocs);
-        context.put("StringUtils", StringUtils.class);
-
-        Template template = null;
-        try {
-
-            File file = new File("out/" + StringUtils.upperCamel(serviceName) + ".java");
-            if(!file.getParentFile().exists()){
-                file.getParentFile().mkdirs();
-            }
-            if(file.exists()){
-                file.delete();
-            }
-            log.info("File path: {}", file.getAbsolutePath());
-            template = ve.getTemplate("templates/FeignClient.vm");
-//            OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(file), Charset.forName("UTF-8"));
-            OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(file));
-            template.merge(context, osw);
-            osw.close();
-        } catch (Exception e) {
-            log.error("{}异常!", optName, e);
+    private VelocityContext initVelocityContext(Map<String, Object> datas) {
+        VelocityContext velocityContext = new VelocityContext();
+        if (datas != null) {
+            datas.keySet().stream().forEach(key -> {
+                velocityContext.put(key, datas.get(key));
+            });
         }
+        velocityContext.put("genBy", "KCodeGen(Velocity)");
+        velocityContext.put("genOn", DateFormatUtils.format(System.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss"));
+        velocityContext.put("StringUtils", StringUtils.class);
+        return velocityContext;
+    }
+
+    public void render(String templateId, Map<String, Object> datas, String targetPath, boolean overwriteOnExists) throws IOException {
+        Preconditions.checkNotNull(templateId, "模板未指定");
+        Preconditions.checkNotNull(targetPath, "输出路径未指定");
+        File file = new File(targetPath);
+        log.info("Target path: {}", file.getAbsolutePath());
+        VelocityContext velocityContext = initVelocityContext(datas);
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+        if (file.exists()) {
+            if (overwriteOnExists) {
+                file.delete();
+            } else {
+                throw new FileAlreadyExistsException(file.getAbsolutePath());
+            }
+        }
+
+        String templatePath = getTemplatePath(templateId);
+
+        Template template = ve.getTemplate(templatePath);
+        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(file))) {
+            template.merge(velocityContext, osw, macroLibraries);
+        }
+    }
+
+    private String getTemplatePath(String templateId) {
+        return "templates/" + templateId + ".vm";
     }
 
 }
