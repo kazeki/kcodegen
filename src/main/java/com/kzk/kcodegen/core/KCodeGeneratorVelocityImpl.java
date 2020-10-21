@@ -1,9 +1,9 @@
-package com.kzk.kcodegen;
+package com.kzk.kcodegen.core;
 
 import com.google.common.base.Preconditions;
+import com.kzk.kcodegen.tools.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.commons.lang.time.FastDateFormat;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -20,12 +20,12 @@ import java.util.Map;
  * @author kazeki
  */
 @Slf4j
-public class KCodeGenerator {
+public class KCodeGeneratorVelocityImpl implements KCodeGenerator {
     private VelocityEngine ve;
     // TODO: macroLibraries
     private List macroLibraries;
 
-    public KCodeGenerator() {
+    public KCodeGeneratorVelocityImpl() {
         this.ve = new VelocityEngine();
         this.ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         this.ve.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
@@ -35,7 +35,7 @@ public class KCodeGenerator {
         this.ve.init();
     }
 
-    public KCodeGenerator(String propsFilename) {
+    public KCodeGeneratorVelocityImpl(String propsFilename) {
         this.ve = new VelocityEngine(propsFilename);
         this.ve.init();
     }
@@ -53,6 +53,7 @@ public class KCodeGenerator {
         return velocityContext;
     }
 
+    @Override
     public void render(String templateId, Map<String, Object> datas, String targetPath, boolean overwriteOnExists) throws IOException {
         Preconditions.checkNotNull(templateId, "模板未指定");
         Preconditions.checkNotNull(targetPath, "输出路径未指定");
@@ -71,11 +72,16 @@ public class KCodeGenerator {
         }
 
         String templatePath = getTemplatePath(templateId);
-
         Template template = ve.getTemplate(templatePath);
+
         try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(file))) {
             template.merge(velocityContext, osw, macroLibraries);
         }
+    }
+
+    private String preProcessTemplateLine(String line) {
+//        System.out.println(line + "->" +  line.replaceAll("^\\s*#","#"));
+        return line.replaceAll("^\\s*#","#")+"\r";
     }
 
     private String getTemplatePath(String templateId) {

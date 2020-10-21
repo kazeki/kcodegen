@@ -1,4 +1,4 @@
-package com.kzk.kcodegen;
+package com.kzk.kcodegen.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

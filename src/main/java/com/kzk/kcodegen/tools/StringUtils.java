@@ -1,4 +1,4 @@
-package com.kzk.kcodegen;
+package com.kzk.kcodegen.tools;
 
 import com.google.common.base.CaseFormat;
 import lombok.extern.slf4j.Slf4j;

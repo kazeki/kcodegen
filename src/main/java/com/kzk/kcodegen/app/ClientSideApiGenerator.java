@@ -1,6 +1,9 @@
-package com.kzk.kcodegen;
+package com.kzk.kcodegen.app;
 
 import com.google.common.collect.Maps;
+import com.kzk.kcodegen.model.ApiDocs;
+import com.kzk.kcodegen.tools.StringUtils;
+import com.kzk.kcodegen.core.KCodeGenerator;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -19,8 +22,8 @@ public class ClientSideApiGenerator{
 
     private KCodeGenerator kCodeGenerator;
 
-    public ClientSideApiGenerator(String velocityConfig){
-        kCodeGenerator = new KCodeGenerator(velocityConfig);
+    public ClientSideApiGenerator(KCodeGenerator kCodeGenerator){
+        this.kCodeGenerator = kCodeGenerator;
     }
 
     public void render(String serviceName, String rootPackage, ApiDocs apiDocs, String outputDir) {

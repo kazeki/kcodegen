@@ -1,0 +1,5 @@
+#macro(header $lines)
+    #foreach($i in [1..$lines])
+=======================
+    #end
+#end

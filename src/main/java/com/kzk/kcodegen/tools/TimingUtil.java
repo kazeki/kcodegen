@@ -1,4 +1,4 @@
-package com.kzk.kcodegen;
+package com.kzk.kcodegen.tools;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
